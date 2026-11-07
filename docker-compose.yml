@@ -1,0 +1,13 @@
+services:
+  specimen-db:
+    image: mongo:7.0
+    container_name: specimen-repo-db
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    volumes:
+      - specimen_mongo_data:/data/db
+
+volumes:
+  specimen_mongo_data:
+    driver: local

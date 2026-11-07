@@ -1,0 +1,4031 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Specimen Repository REST API",
+        "description": "Production-grade REST API backend for managing biological specimens, taxonomy, collections, researchers, locations, media files, specimen loans, and administrative audit logging. Built with Laravel 13 and MongoDB.",
+        "contact": {
+            "name": "API Support",
+            "email": "admin@specimenrepo.local"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Current Host Environment"
+        }
+    ],
+    "paths": {
+        "/api/v1/audit-logs": {
+            "get": {
+                "tags": [
+                    "Audit Logs"
+                ],
+                "summary": "List Audit Logs",
+                "description": "Retrieve paginated administrative audit logs tracking system actions.",
+                "operationId": "db4384082299cc97b27da470b1698dae",
+                "parameters": [
+                    {
+                        "name": "action",
+                        "in": "query",
+                        "description": "Filter by action (e.g. LOGIN, CREATE_SPECIMEN, APPROVE_LOAN)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "resource_type",
+                        "in": "query",
+                        "description": "Filter by resource type (e.g. Specimen, Loan)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of audit logs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/audit-logs/{id}": {
+            "get": {
+                "tags": [
+                    "Audit Logs"
+                ],
+                "summary": "Get Audit Log Details",
+                "description": "Retrieve details of a single audit log entry by ID.",
+                "operationId": "c05d55934a6b4f17e231e0cd76a50797",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Audit Log ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Audit log details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Audit log not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Admin Login",
+                "description": "Authenticate administrator with email and password to receive a Bearer API token.",
+                "operationId": "a7997e7c1e3bfed64d4e56de82415931",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@specimenrepo.local"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "SecretPassword123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful authentication",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login successful."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "admin": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "67d280e5b7a5a8f4c201a011"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Super Administrator"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "admin@specimenrepo.local"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "super_admin"
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "active"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "1|2abf8e819b5b244ce2f8319f61b0c034509172"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error or invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Admin Logout",
+                "description": "Invalidate current administrator authentication token.",
+                "operationId": "f6b8957b4c0b25636613a9f0512a8ba9",
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully logged out."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Current Authenticated Admin",
+                "description": "Retrieve details of the currently authenticated administrator.",
+                "operationId": "37d33f0281f67d31d05b4c45eea0143b",
+                "responses": {
+                    "200": {
+                        "description": "Current administrator profile",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Authenticated administrator profile."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "67d280e5b7a5a8f4c201a011"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Super Administrator"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "admin@specimenrepo.local"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "super_admin"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "active"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/collections": {
+            "get": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "List Collections",
+                "description": "Retrieve paginated list of specimen collections.",
+                "operationId": "a43886311ec672ee48ac50e3d891eb93",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search collection name or collector",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status (active, archived, closed)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of collections",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Collection"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Create Collection",
+                "description": "Create a new specimen collection.",
+                "operationId": "7fe3dedbb5828e75412306ea8350dbca",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Mindanao Highland Flora & Fauna"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Biodiversity survey of high-elevation taxa"
+                                    },
+                                    "collection_type": {
+                                        "type": "string",
+                                        "example": "Regional Biodiversity"
+                                    },
+                                    "collector": {
+                                        "type": "string",
+                                        "example": "Prof. Juan dela Cruz"
+                                    },
+                                    "date_started": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-06-01"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Collection created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Collection"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/collections/{id}": {
+            "get": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Get Collection Details",
+                "description": "Retrieve details of a single collection by ID.",
+                "operationId": "879c1ecc5b85bcc343a6f733a6503f8b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Collection ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Collection details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Collection"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collection not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Update Collection",
+                "description": "Update details of an existing collection.",
+                "operationId": "f52028cd5c258f360481b17f3f2f37a6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Collection ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Expanded survey of high-elevation taxa"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Collection updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Collection"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collection not found"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Delete Collection",
+                "description": "Delete a collection record.",
+                "operationId": "6a9745d555442eb9a157cc035b75c587",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Collection ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Collection deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Collection deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collection not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/collections/{id}/specimens": {
+            "get": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "List Specimens Belonging to Collection",
+                "description": "Retrieve all specimens categorized under a specific collection.",
+                "operationId": "19b3a42824047986d57ea7270e4c1750",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Collection ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated specimens in collection",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Specimen"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collection not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/loans": {
+            "get": {
+                "tags": [
+                    "Loans"
+                ],
+                "summary": "List Specimen Loans",
+                "description": "Retrieve paginated list of specimen loan transactions.",
+                "operationId": "d7f02ad86f88a5dac398b7f9467126f1",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by loan status (pending, approved, active, returned, overdue, cancelled)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "specimen_id",
+                        "in": "query",
+                        "description": "Filter by specimen ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "researcher_id",
+                        "in": "query",
+                        "description": "Filter by researcher ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of loans",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Loan"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Loans"
+                ],
+                "summary": "Create Specimen Loan",
+                "description": "Create a new specimen loan transaction. Specimen must be in active status.",
+                "operationId": "9ec99d739226d4e1e61c1132cb2c8eac",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "specimen_id",
+                                    "researcher_id",
+                                    "borrower_name",
+                                    "purpose",
+                                    "loan_date",
+                                    "expected_return_date"
+                                ],
+                                "properties": {
+                                    "specimen_id": {
+                                        "type": "string",
+                                        "example": "67d280e5b7a5a8f4c201a011"
+                                    },
+                                    "researcher_id": {
+                                        "type": "string",
+                                        "example": "67d280e5b7a5a8f4c201a050"
+                                    },
+                                    "borrower_name": {
+                                        "type": "string",
+                                        "example": "Dr. Elena Rostova"
+                                    },
+                                    "purpose": {
+                                        "type": "string",
+                                        "example": "Cranial CT-scan morphometric study"
+                                    },
+                                    "loan_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-04-01"
+                                    },
+                                    "expected_return_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-06-01"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Specimen requires climate-controlled shipping"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Loan created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Loan request created successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Loan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Specimen already loaned or unavailable"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/loans/{id}": {
+            "get": {
+                "tags": [
+                    "Loans"
+                ],
+                "summary": "Get Loan Details",
+                "description": "Retrieve details of a single loan transaction by ID.",
+                "operationId": "7ad991030569edb2a676fcce8060a386",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Loan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Loan details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Loan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Loan not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/loans/{id}/approve": {
+            "post": {
+                "tags": [
+                    "Loans"
+                ],
+                "summary": "Approve Specimen Loan",
+                "description": "Approve a pending loan transaction. Automatically changes the specimen status to loaned.",
+                "operationId": "4512032f152e8ef84d98a74301579b9f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Loan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Loan approved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Loan approved successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Loan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition or specimen unavailable"
+                    },
+                    "404": {
+                        "description": "Loan not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/loans/{id}/return": {
+            "post": {
+                "tags": [
+                    "Loans"
+                ],
+                "summary": "Return Specimen Loan",
+                "description": "Record the return of a loaned specimen. Automatically changes the specimen status back to active.",
+                "operationId": "dca196ffdefec46cc9dfc425e5783b39",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Loan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "actual_return_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-05-20"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Returned in pristine condition without damages"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Specimen returned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Specimen returned and status restored to active."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Loan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition"
+                    },
+                    "404": {
+                        "description": "Loan not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/loans/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "Loans"
+                ],
+                "summary": "Cancel Specimen Loan",
+                "description": "Cancel a loan transaction. Reverts specimen status to active if previously approved.",
+                "operationId": "876664b344eb3912dfcd6f42a2bdf8be",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Loan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "example": "Borrower cancelled request due to grant timing"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Loan cancelled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Loan cancelled successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Loan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition"
+                    },
+                    "404": {
+                        "description": "Loan not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/locations": {
+            "get": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "List Locations",
+                "description": "Retrieve paginated list of collection sites and repository storage locations.",
+                "operationId": "49873ce3b7837cc865db7849ec7cccda",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search location name, province, municipality",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "province",
+                        "in": "query",
+                        "description": "Filter by province",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of locations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Location"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "Create Location",
+                "description": "Register a new collection site or repository location.",
+                "operationId": "aff6a55f233e5e2483ad2a6b68576fbb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Mount Apo Natural Park"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Primary forest collection site"
+                                    },
+                                    "province": {
+                                        "type": "string",
+                                        "example": "Davao del Sur"
+                                    },
+                                    "municipality": {
+                                        "type": "string",
+                                        "example": "Bansalan"
+                                    },
+                                    "barangay": {
+                                        "type": "string",
+                                        "example": "Managa"
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 6.9875
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 125.2711
+                                    },
+                                    "habitat": {
+                                        "type": "string",
+                                        "example": "Montane mossy forest"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Location created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Location"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/locations/{id}": {
+            "get": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "Get Location Details",
+                "description": "Retrieve details of a single location by ID.",
+                "operationId": "297bb90722857403e546b74145806a12",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Location ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Location details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Location"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Location not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "Update Location",
+                "description": "Update details of an existing location.",
+                "operationId": "f8115ec393e6a83bc212ee2a6bbb5ee7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Location ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "habitat": {
+                                        "type": "string",
+                                        "example": "Subalpine and mossy forest"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Location updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Location"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Location not found"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Locations"
+                ],
+                "summary": "Delete Location",
+                "description": "Delete a location record.",
+                "operationId": "732da05f06d706d822b05dd8c62945aa",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Location ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Location deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Location deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Location not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/projects": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "List Projects",
+                "description": "Retrieve paginated list of research projects.",
+                "operationId": "8a48f62abebb21637942cb7cab09b432",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by title, code, description",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status (planning, active, completed, suspended)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of projects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Project"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Create Project",
+                "description": "Register a new research project.",
+                "operationId": "1fa99730c48063d63c839811a6fac77b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "project_code",
+                                    "title"
+                                ],
+                                "properties": {
+                                    "project_code": {
+                                        "type": "string",
+                                        "example": "PRJ-RAPTOR-2026"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Southeast Asian Raptor Evolutionary Morphology"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Comparative morphology across island archipelagos"
+                                    },
+                                    "principal_researcher_id": {
+                                        "type": "string",
+                                        "example": "67d280e5b7a5a8f4c201a050"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-01-01"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2027-12-31"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Project created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Project"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/projects/{id}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get Project Details",
+                "description": "Retrieve details of a single research project by ID.",
+                "operationId": "24bd51bf40980914c88562c2b80d5658",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Project"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Update Project",
+                "description": "Update details of an existing research project.",
+                "operationId": "f933972a11c4109dfa4e519d905e9579",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Project Title"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "completed"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Project updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Project"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Delete Project",
+                "description": "Delete a research project.",
+                "operationId": "daf9f94b2b9c1cd8f64bab4547da123a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Project deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/projects/{id}/specimens": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "List Specimens Belonging to Project",
+                "description": "Retrieve all biological specimens associated with this project.",
+                "operationId": "1b042908fae6dd48b70db2844ecba2cf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of specimens in project",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Specimen"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/reports/dashboard": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Dashboard Summary Metrics",
+                "description": "High-level counts and status distributions powered by MongoDB aggregation pipelines.",
+                "operationId": "00ef5289d069e98ea1dd5dfe0cfc70ca",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard metrics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dashboard metrics retrieved successfully."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "specimens": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 150
+                                                        },
+                                                        "by_status": {
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "loans": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 25
+                                                        },
+                                                        "active": {
+                                                            "type": "integer",
+                                                            "example": 8
+                                                        },
+                                                        "overdue": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "totals": {
+                                                    "properties": {
+                                                        "taxa": {
+                                                            "type": "integer",
+                                                            "example": 45
+                                                        },
+                                                        "collections": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "researchers": {
+                                                            "type": "integer",
+                                                            "example": 30
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/reports/specimens": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Specimens Analytics Report",
+                "description": "Detailed breakdown of specimens by status, kingdom, preservation method, and monthly acquisition trends.",
+                "operationId": "5e54871652194f3a777a2b1a0e9efe14",
+                "responses": {
+                    "200": {
+                        "description": "Specimens report",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/reports/taxonomy": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Taxonomy Analytics Report",
+                "description": "Taxonomic aggregation of specimens grouped by class, order, and top families.",
+                "operationId": "95936824ef24aab03921fe03c2fa074e",
+                "responses": {
+                    "200": {
+                        "description": "Taxonomy report",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/reports/collections": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Collections Analytics Report",
+                "description": "Collection statistics including specimen counts per collection and status groupings.",
+                "operationId": "775009cd19548f852473426c45eb0c95",
+                "responses": {
+                    "200": {
+                        "description": "Collections report",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/reports/loans": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Loans & Circulation Report",
+                "description": "Loan analytics including status breakdown, overdue loans list, and top borrowing researchers.",
+                "operationId": "5a1eb224630784a346fd1506d233d840",
+                "responses": {
+                    "200": {
+                        "description": "Loans report",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/researchers": {
+            "get": {
+                "tags": [
+                    "Researchers"
+                ],
+                "summary": "List Researchers",
+                "description": "Retrieve paginated list of researchers and scientists.",
+                "operationId": "4ee1d79aab165bd2981fc21144d724cf",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name, email, institution, specialization",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status (active, inactive)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of researchers",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Researcher"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Researchers"
+                ],
+                "summary": "Register Researcher",
+                "description": "Register a new researcher or external investigator.",
+                "operationId": "f1375fd99463521b76fe464c18c63e74",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Dr. Elena Rostova"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "e.rostova@university.edu"
+                                    },
+                                    "institution": {
+                                        "type": "string",
+                                        "example": "State University Department of Biology"
+                                    },
+                                    "department": {
+                                        "type": "string",
+                                        "example": "Zoology Division"
+                                    },
+                                    "specialization": {
+                                        "type": "string",
+                                        "example": "Raptor Osteology"
+                                    },
+                                    "contact_information": {
+                                        "type": "string",
+                                        "example": "+1-555-0199 / Lab 402"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Researcher registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Researcher"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/researchers/{id}": {
+            "get": {
+                "tags": [
+                    "Researchers"
+                ],
+                "summary": "Get Researcher Details",
+                "description": "Retrieve details of a single researcher by ID.",
+                "operationId": "6159b12a17111637329c53c4ad3780a2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Researcher ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Researcher details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Researcher"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Researcher not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Researchers"
+                ],
+                "summary": "Update Researcher",
+                "description": "Update details of an existing researcher.",
+                "operationId": "2598ffcfa407121722af236932aee9b0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Researcher ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "institution": {
+                                        "type": "string",
+                                        "example": "National Institute of Biodiversity"
+                                    },
+                                    "specialization": {
+                                        "type": "string",
+                                        "example": "Avian Genomics and Morphology"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Researcher updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Researcher"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Researcher not found"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Researchers"
+                ],
+                "summary": "Delete Researcher",
+                "description": "Delete a researcher record.",
+                "operationId": "3db16445cda6e82f22a41644efeaffb9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Researcher ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Researcher deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Researcher deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Researcher not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/specimens": {
+            "get": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "List Specimens",
+                "description": "Retrieve paginated list of biological specimens with optional search, filtering, and sorting.",
+                "operationId": "95bc2b050ed7be0c9b786e3a3b61c2a3",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search query across scientific name, common name, code, genus, species",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status (active, loaned, damaged, lost, deaccessioned)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "collection_id",
+                        "in": "query",
+                        "description": "Filter by collection ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "taxon_id",
+                        "in": "query",
+                        "description": "Filter by taxon ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "location_id",
+                        "in": "query",
+                        "description": "Filter by location ID",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Field to sort by (created_at, specimen_code, scientific_name, collection_date)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at"
+                        }
+                    },
+                    {
+                        "name": "sort_order",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "desc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of specimens",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Specimens retrieved successfully."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Specimen"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "Create Specimen",
+                "description": "Register a new biological specimen.",
+                "operationId": "52b5829ecfbad3fc1567cfba8a9b5b70",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "specimen_code",
+                                    "scientific_name"
+                                ],
+                                "properties": {
+                                    "specimen_code": {
+                                        "type": "string",
+                                        "example": "SPEC-2026-001"
+                                    },
+                                    "catalog_number": {
+                                        "type": "string",
+                                        "example": "CAT-00123"
+                                    },
+                                    "scientific_name": {
+                                        "type": "string",
+                                        "example": "Pithecophaga jefferyi"
+                                    },
+                                    "common_name": {
+                                        "type": "string",
+                                        "example": "Philippine Eagle"
+                                    },
+                                    "kingdom": {
+                                        "type": "string",
+                                        "example": "Animalia"
+                                    },
+                                    "phylum": {
+                                        "type": "string",
+                                        "example": "Chordata"
+                                    },
+                                    "class": {
+                                        "type": "string",
+                                        "example": "Aves"
+                                    },
+                                    "order": {
+                                        "type": "string",
+                                        "example": "Accipitriformes"
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "example": "Accipitridae"
+                                    },
+                                    "genus": {
+                                        "type": "string",
+                                        "example": "Pithecophaga"
+                                    },
+                                    "species": {
+                                        "type": "string",
+                                        "example": "jefferyi"
+                                    },
+                                    "taxon_id": {
+                                        "type": "string",
+                                        "example": "67d280e5b7a5a8f4c201a020"
+                                    },
+                                    "collection_id": {
+                                        "type": "string",
+                                        "example": "67d280e5b7a5a8f4c201a030"
+                                    },
+                                    "location_id": {
+                                        "type": "string",
+                                        "example": "67d280e5b7a5a8f4c201a040"
+                                    },
+                                    "collector": {
+                                        "type": "string",
+                                        "example": "Dr. Maria Santos"
+                                    },
+                                    "collection_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-03-15"
+                                    },
+                                    "preservation_method": {
+                                        "type": "string",
+                                        "example": "skeletal"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Specimen created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Specimen created successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Specimen"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/specimens/{id}": {
+            "get": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "Get Specimen Details",
+                "description": "Retrieve complete record for a single specimen by ID.",
+                "operationId": "780f4c8f3037351f081070adfc0b21f9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specimen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Specimen record",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Specimen retrieved successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Specimen"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Specimen not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "Update Specimen",
+                "description": "Update details of an existing specimen.",
+                "operationId": "0b3d25ac1cf202cbc7230db6e90765d3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specimen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "common_name": {
+                                        "type": "string",
+                                        "example": "Great Philippine Eagle"
+                                    },
+                                    "preservation_method": {
+                                        "type": "string",
+                                        "example": "dry"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Specimen updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Specimen updated successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Specimen"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Specimen not found"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "Delete Specimen",
+                "description": "Remove a specimen record (super_admin or admin role required).",
+                "operationId": "31d348077efadb96c1520ba565bf232c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specimen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Specimen deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Specimen deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Cannot delete loaned specimen"
+                    },
+                    "404": {
+                        "description": "Specimen not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/specimens/{id}/images": {
+            "get": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "List Specimen Images",
+                "description": "Retrieve all uploaded images for a specimen.",
+                "operationId": "c1e84af887414ce01c6dcdf87e01f9a9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specimen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of specimen images",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Specimen images retrieved successfully."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "Upload Specimen Image",
+                "description": "Upload and associate an image file with a specimen.",
+                "operationId": "49bb0571bb34a93aafac6c1b552da9ec",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specimen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "description": "Image file (jpg, png, webp)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "caption": {
+                                        "type": "string",
+                                        "example": "Dorsal view of specimen"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "dorsal",
+                                        "enum": [
+                                            "dorsal",
+                                            "ventral",
+                                            "lateral",
+                                            "habitat",
+                                            "microscopic",
+                                            "other"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Image uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Image uploaded successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/specimens/{id}/documents": {
+            "get": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "List Specimen Documents",
+                "description": "Retrieve all attached documents and field notes for a specimen.",
+                "operationId": "69bf11174c4fa63d8893e206124e76b5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specimen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of specimen documents",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Specimen documents retrieved successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Specimens"
+                ],
+                "summary": "Upload Specimen Document",
+                "description": "Upload and associate a document (PDF, notes, sequencing) with a specimen.",
+                "operationId": "8fc96fd2f8114a5a1e1709473cff41a5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Specimen ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "document"
+                                ],
+                                "properties": {
+                                    "document": {
+                                        "description": "Document file (pdf, docx, txt)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "document_type": {
+                                        "type": "string",
+                                        "example": "field_notes",
+                                        "enum": [
+                                            "field_notes",
+                                            "dna_sequence",
+                                            "permits",
+                                            "publication",
+                                            "report",
+                                            "other"
+                                        ]
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Field collection log and GPS logs"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Document uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Document uploaded successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/taxa": {
+            "get": {
+                "tags": [
+                    "Taxonomy"
+                ],
+                "summary": "List Taxa",
+                "description": "Retrieve paginated list of taxonomic records with optional search.",
+                "operationId": "b3c221e05169dfccd39be6d2ce7cb460",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by scientific name, common name, family, genus",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "kingdom",
+                        "in": "query",
+                        "description": "Filter by kingdom",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of taxa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Taxa retrieved successfully."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Taxon"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Taxonomy"
+                ],
+                "summary": "Create Taxon",
+                "description": "Register a new taxonomic classification.",
+                "operationId": "b0c699ad2a3f3e486b9070e50c150975",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "scientific_name"
+                                ],
+                                "properties": {
+                                    "scientific_name": {
+                                        "type": "string",
+                                        "example": "Tarsius syrichta"
+                                    },
+                                    "common_name": {
+                                        "type": "string",
+                                        "example": "Philippine Tarsier"
+                                    },
+                                    "kingdom": {
+                                        "type": "string",
+                                        "example": "Animalia"
+                                    },
+                                    "phylum": {
+                                        "type": "string",
+                                        "example": "Chordata"
+                                    },
+                                    "class": {
+                                        "type": "string",
+                                        "example": "Mammalia"
+                                    },
+                                    "order": {
+                                        "type": "string",
+                                        "example": "Primates"
+                                    },
+                                    "family": {
+                                        "type": "string",
+                                        "example": "Tarsiidae"
+                                    },
+                                    "genus": {
+                                        "type": "string",
+                                        "example": "Tarsius"
+                                    },
+                                    "species": {
+                                        "type": "string",
+                                        "example": "syrichta"
+                                    },
+                                    "authority": {
+                                        "type": "string",
+                                        "example": "Linnaeus, 1758"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Taxon created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Taxon created successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Taxon"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/taxa/{id}": {
+            "get": {
+                "tags": [
+                    "Taxonomy"
+                ],
+                "summary": "Get Taxon Details",
+                "description": "Retrieve details of a single taxon by ID.",
+                "operationId": "ff454950736251edc7100d216194af2f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Taxon ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Taxon details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Taxon"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Taxon not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Taxonomy"
+                ],
+                "summary": "Update Taxon",
+                "description": "Update details of an existing taxon.",
+                "operationId": "7dec2101173c42ace54117d1735e88c2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Taxon ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "common_name": {
+                                        "type": "string",
+                                        "example": "Philippine Tarsier"
+                                    },
+                                    "authority": {
+                                        "type": "string",
+                                        "example": "Linnaeus, 1758"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Taxon updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Taxon"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Taxon not found"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Taxonomy"
+                ],
+                "summary": "Delete Taxon",
+                "description": "Delete a taxon record.",
+                "operationId": "e7de95b3ffcdc6b1ff881fddc872fe47",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Taxon ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Taxon deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Taxon deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Taxon not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Specimen": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a011"
+                    },
+                    "specimen_code": {
+                        "type": "string",
+                        "example": "SPEC-2026-001"
+                    },
+                    "catalog_number": {
+                        "type": "string",
+                        "example": "CAT-00123"
+                    },
+                    "scientific_name": {
+                        "type": "string",
+                        "example": "Pithecophaga jefferyi"
+                    },
+                    "common_name": {
+                        "type": "string",
+                        "example": "Philippine Eagle"
+                    },
+                    "kingdom": {
+                        "type": "string",
+                        "example": "Animalia"
+                    },
+                    "phylum": {
+                        "type": "string",
+                        "example": "Chordata"
+                    },
+                    "class": {
+                        "type": "string",
+                        "example": "Aves"
+                    },
+                    "order": {
+                        "type": "string",
+                        "example": "Accipitriformes"
+                    },
+                    "family": {
+                        "type": "string",
+                        "example": "Accipitridae"
+                    },
+                    "genus": {
+                        "type": "string",
+                        "example": "Pithecophaga"
+                    },
+                    "species": {
+                        "type": "string",
+                        "example": "jefferyi"
+                    },
+                    "taxon_id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a020"
+                    },
+                    "collection_id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a030"
+                    },
+                    "project_id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a035"
+                    },
+                    "collector": {
+                        "type": "string",
+                        "example": "Dr. Maria Santos"
+                    },
+                    "collection_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-03-15"
+                    },
+                    "location_id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a040"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 7.0094
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 125.2789
+                    },
+                    "habitat": {
+                        "type": "string",
+                        "example": "Primary lowland tropical rainforest"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Well-preserved skeletal specimen"
+                    },
+                    "preservation_method": {
+                        "type": "string",
+                        "example": "skeletal"
+                    },
+                    "repository_location": {
+                        "type": "string",
+                        "example": "Cabinet B, Shelf 4"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "active"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-03-15T08:30:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-03-15T08:30:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Taxon": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a020"
+                    },
+                    "kingdom": {
+                        "type": "string",
+                        "example": "Animalia"
+                    },
+                    "phylum": {
+                        "type": "string",
+                        "example": "Chordata"
+                    },
+                    "class": {
+                        "type": "string",
+                        "example": "Aves"
+                    },
+                    "order": {
+                        "type": "string",
+                        "example": "Accipitriformes"
+                    },
+                    "family": {
+                        "type": "string",
+                        "example": "Accipitridae"
+                    },
+                    "genus": {
+                        "type": "string",
+                        "example": "Pithecophaga"
+                    },
+                    "species": {
+                        "type": "string",
+                        "example": "jefferyi"
+                    },
+                    "scientific_name": {
+                        "type": "string",
+                        "example": "Pithecophaga jefferyi"
+                    },
+                    "common_name": {
+                        "type": "string",
+                        "example": "Philippine Eagle"
+                    },
+                    "authority": {
+                        "type": "string",
+                        "example": "Ogilvie-Grant, 1896"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Apex avian predator endemic to the Philippines"
+                    }
+                },
+                "type": "object"
+            },
+            "Collection": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a030"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Philippine Avian Biodiversity Survey"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Field collection of endemic avian species"
+                    },
+                    "collection_type": {
+                        "type": "string",
+                        "example": "Ornithology"
+                    },
+                    "collector": {
+                        "type": "string",
+                        "example": "National Museum Research Team"
+                    },
+                    "date_started": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-01-10"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "active"
+                    }
+                },
+                "type": "object"
+            },
+            "Researcher": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a050"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Dr. Elena Rostova"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "e.rostova@university.edu"
+                    },
+                    "institution": {
+                        "type": "string",
+                        "example": "State University Department of Biology"
+                    },
+                    "department": {
+                        "type": "string",
+                        "example": "Zoology Division"
+                    },
+                    "specialization": {
+                        "type": "string",
+                        "example": "Raptor Osteology"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "active"
+                    }
+                },
+                "type": "object"
+            },
+            "Project": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a060"
+                    },
+                    "project_code": {
+                        "type": "string",
+                        "example": "PRJ-RAPTOR-2026"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Southeast Asian Raptor Evolutionary Morphology"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Comparative morphology across island archipelagos"
+                    },
+                    "principal_researcher_id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a050"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-01-01"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "active"
+                    }
+                },
+                "type": "object"
+            },
+            "Location": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a040"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Mount Apo Natural Park"
+                    },
+                    "province": {
+                        "type": "string",
+                        "example": "Davao del Sur"
+                    },
+                    "municipality": {
+                        "type": "string",
+                        "example": "Bansalan"
+                    },
+                    "barangay": {
+                        "type": "string",
+                        "example": "Managa"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 6.9875
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 125.2711
+                    },
+                    "habitat": {
+                        "type": "string",
+                        "example": "Montane mossy forest"
+                    }
+                },
+                "type": "object"
+            },
+            "Loan": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a070"
+                    },
+                    "specimen_id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a011"
+                    },
+                    "researcher_id": {
+                        "type": "string",
+                        "example": "67d280e5b7a5a8f4c201a050"
+                    },
+                    "borrower_name": {
+                        "type": "string",
+                        "example": "Dr. Elena Rostova"
+                    },
+                    "purpose": {
+                        "type": "string",
+                        "example": "Cranial CT-scan morphometric study"
+                    },
+                    "loan_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-04-01"
+                    },
+                    "expected_return_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-06-01"
+                    },
+                    "actual_return_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": null
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "approved"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Enter your Bearer token obtained from POST /api/v1/auth/login",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Admin login, logout, and profile operations"
+        },
+        {
+            "name": "Specimens",
+            "description": "Biological specimen management, filtering, searching, images, and documents"
+        },
+        {
+            "name": "Taxonomy",
+            "description": "Taxonomic ranks and biological classification"
+        },
+        {
+            "name": "Collections",
+            "description": "Specimen collection groupings"
+        },
+        {
+            "name": "Researchers",
+            "description": "Researchers, scientists, and borrowers"
+        },
+        {
+            "name": "Projects",
+            "description": "Research projects and specimen affiliations"
+        },
+        {
+            "name": "Locations",
+            "description": "Geographic collection sites and repository storage locations"
+        },
+        {
+            "name": "Loans",
+            "description": "Specimen loan transactions and lifecycle approval/return workflow"
+        },
+        {
+            "name": "Reports",
+            "description": "Analytics and statistical reports powered by MongoDB aggregation pipelines"
+        },
+        {
+            "name": "Audit Logs",
+            "description": "Audit logs tracking administrative state-changing operations"
+        }
+    ]
+}
